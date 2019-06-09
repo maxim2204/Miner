@@ -1,8 +1,8 @@
 import random
 
 class MapModel(object):
-    NOT_CLICKED_EMPTY = 0
-    NOT_CLICKED_BOMB = "*"
+    NOT_CLICKED_EMPTY = "0+"
+    NOT_CLICKED_BOMB = "*+"
     def __init__(self, h, w, b):
         self.h = h
         self.w = w
@@ -51,33 +51,33 @@ class MapModel(object):
     def count_mins(self):
         for i in range(self.h):
             for j in range(self.w):
-                if  self.map[i][j] != "*":
+                if  self.map[i][j] != "*+":
                     count = 0
                     if i != self.h -1 and j != self.w - 1:
-                        if self.map[i+1][j+1] == "*":
+                        if self.map[i+1][j+1] == "*+":
                             count += 1
                     if i != 0 and j != 0:
-                        if self.map[i-1][j-1] == "*":
+                        if self.map[i-1][j-1] == "*+":
                             count += 1
                     if i != 0 and j != self.w - 1:
-                        if self.map[i-1][j+1] == "*":
+                        if self.map[i-1][j+1] == "*+":
                             count += 1
                     if i != self.h - 1 and j != 0:
-                        if self.map[i+1][j-1] == "*":
+                        if self.map[i+1][j-1] == "*+":
                             count += 1
                     if j != self.w - 1:
-                        if self.map[i][j+1] == "*":
+                        if self.map[i][j+1] == "*+":
                             count += 1
                     if i != self.h - 1:
-                        if self.map[i+1][j] == "*":
+                        if self.map[i+1][j] == "*+":
                             count += 1
                     if j != 0:
-                        if self.map[i][j-1] == "*":
+                        if self.map[i][j-1] == "*+":
                             count += 1
                     if i != 0:
-                        if self.map[i-1][j] == "*":
+                        if self.map[i-1][j] == "*+":
                             count += 1
-                    self.map[i][j] = count
+                    self.map[i][j] = str(count)+"+"
         print(self.map)
         return self.map
 

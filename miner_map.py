@@ -44,7 +44,7 @@ class MinerMap(QtWidgets.QWidget):
             buts.append([])
             for j in range(self.W):
                 #buts[-1].append(QtWidgets.QPushButton("{} {}".format(i,j), self))
-                buts[-1].append(MyButton2("*", self))
+                buts[-1].append(MyButton2("*+", self))
                 buts[-1][-1].setMinimumSize(25, 25)
                 buts[-1][-1].setMaximumSize(25, 25)
                 buts[-1][-1].clicked.connect(self.btnclick)
@@ -84,8 +84,8 @@ class MinerMap(QtWidgets.QWidget):
             if self.MAP.is_bomb(i, j) == True:
                 self.game_end("click", "lose")
             else:
-                self.buts[i][j].setText(str(self.cart[i][j]))
-                self.buts[i][j].setDisabled(True)
+                self.buts[i][j].setText(str(self.cart[i][j][0]))
+                self.buts[i][j][1] == "-"
                 self.open += 1
                 print(i, "", j, "", self.open, "/", self.H * self.W - self.N, "click")
                 if self.open == self.H * self.W - self.N:
@@ -94,9 +94,9 @@ class MinerMap(QtWidgets.QWidget):
                 self.no_mins(i,j)
 
     def set_text(self,i,j):
-        if self.cart[i][j] != "*" and self.buts[i][j].isEnabled():
-            self.buts[i][j].setText(str(self.cart[i][j]))
-            self.buts[i][j].setDisabled(True)
+        if self.cart[i][j] != "*+" and self.buts[i][j][1] == "+":
+            self.buts[i][j].setText(str(self.cart[i][j])[0])
+            self.buts[i][j][1] == "-"
             self.open += 1
             print(i, "", j, "", self.open,"/",self.H * self.W - self.N, "no_mins")
             if self.cart[i][j] == 0:
