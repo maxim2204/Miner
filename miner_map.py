@@ -96,11 +96,13 @@ class MinerMap(QtWidgets.QWidget):
                     self.buts[i[0]][i[1]].setText(self.bomb)
                 self.disabled(True)
                 self.clock.stop()
+                self.game_end("lose")
             elif result["type"] == "win_cell":
                 x = result["value"]
                 self.buts[i][j].setText(x)
                 self.disabled(True)
                 self.clock.stop()
+                self.game_end("win")
 
 
 
