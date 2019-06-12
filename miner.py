@@ -39,7 +39,6 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('minesweeper by taurl and Alexey')
         self.setWindowIcon(QIcon('minesweeper-ico.png'))
         self.map_ = MinerMap(x,y,z,0,self)
-        self.buts = self.map_.getbuts()
 
         #self.setCentralWidget(self.map_)
         #self.map_.disabled(True)

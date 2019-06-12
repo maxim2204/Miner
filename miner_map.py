@@ -1,5 +1,5 @@
 import sys
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, Qt
 from PyQt5.QtWidgets import QMessageBox
 from map_model import MapModel
 from button2 import MyButton2
@@ -7,24 +7,22 @@ from digitalClock import DigitalClock
 
 class MinerMap(QtWidgets.QWidget):
 
-    def __init__(self, H, W, N, cheat, parent):
+    def __init__(self, h, w, b, cheat, parent):
         super().__init__(parent)
-        self.W = W
-        self.H = H
-        self.N = N
+        self.w = w
+        self.h = h
+        self.b = b
 
         self.initUI()
 
         self.cheat = cheat
 
-        self.MAP = MapModel(H, W , N)
+        self.MAP = MapModel(h, w , b)
 
         self.cart = self.MAP.generate()
-        print(self.cart)
 
         self.open = 0
         self.win = False
-
         self.end = False
 
         if self.cheat == 1:
@@ -40,9 +38,9 @@ class MinerMap(QtWidgets.QWidget):
 
         buts = []
 
-        for i in range(self.H):
+        for i in range(self.h):
             buts.append([])
-            for j in range(self.W):
+            for j in range(self.w):
                 #buts[-1].append(QtWidgets.QPushButton("{} {}".format(i,j), self))
                 buts[-1].append(MyButton2("*+", self))
                 buts[-1][-1].setMinimumSize(25, 25)
@@ -56,8 +54,8 @@ class MinerMap(QtWidgets.QWidget):
         self.setLayout(vbox)
         self.show()
 
-    def onMiddleClick(self, button):
-        for i in range(self.H):
+    """def onMiddleClick(self, button):
+        for i in range(self.h):
             if button in self.buts[i]:
                 j = self.buts[i].index(button)
             else:
@@ -66,7 +64,7 @@ class MinerMap(QtWidgets.QWidget):
 
 
     def getbuts(self):
-        return self.buts
+        return self.buts"""
 
     def btnclick(self):
 
@@ -75,33 +73,32 @@ class MinerMap(QtWidgets.QWidget):
             self.clock.reset()
             self.clock.start()
 
-        sender = self.sender()
 
-        for i in range(self.H):
-            if sender in self.buts[i]:
-                j = self.buts[i].index(sender)
+        for i in range(self.h):
+            if self.sender() in self.buts[i]:
+                j = self.buts[i].index(self.sender())
             else:
                 continue
-            result = self.MAP.btnclick(i, j, mouseBut)
-            """
-            if self.MAP.is_bomb(i, j) == True:
-                self.game_end("click", "lose")
-            else:
-                self.buts[i][j].setText(str(self.cart[i][j][0]))
-                self.buts[i][j][1] == "-"
-                self.open += 1
-                print(i, "", j, "", self.open, "/", self.H * self.W - self.N, "click")
-                if self.open == self.H * self.W - self.N:
-                    self.game_end("click", "win")
-            if self.cart[i][j] == 0:
-                self.no_mins(i,j)
-            """
-    def set_text(self,i,j):
+
+            result = self.MAP.btnclick(i, j, Qt.Qt.LeftButton)
+            if result["type"] == "cell":
+                self.buts[i][j].setText(result["value"])
+            elif result["type"] == "cell_ZERO":
+                x = result["value"]
+                for i in x:
+                    self.buts[i[0]][i[1]].setText(i[2])
+
+
+
+
+
+
+    """def set_text(self,i,j):
         if self.cart[i][j] != "*" and self.buts[i][j].isEnabled():
             self.buts[i][j].setText(str(self.cart[i][j]))
             self.buts[i][j][1] == "-"
             self.open += 1
-            print(i, "", j, "", self.open,"/",self.H * self.W - self.N, "no_mins")
+            print(i, "", j, "", self.open,"/",self.h * self.w - self.b, "no_mins")
             if self.cart[i][j] == 0:
                 self.no_mins(i,j)
 
@@ -137,10 +134,10 @@ class MinerMap(QtWidgets.QWidget):
 
 
     def disabled(self, TF):
-        for i in range(self.H):
+        for i in range(self.h):
             self.buts.append([])
-            for j in range(self.W):
-                self.buts[i][j].setDisabled(TF)
+            for j in range(self.w):
+                self.buts[i][j].setDisabled(TF)"""
 
 
 

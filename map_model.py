@@ -1,25 +1,27 @@
 import random
 from PyQt5 import Qt
 
-from PyQt5 import QtCore
-
 class MapModel(object):
+
     NOT_CLICKED_EMPTY = "0+"
     NOT_CLICKED_BOMB = "*+"
-    # NOT_CLICKED_CELL and CLICKED_CELL chars are appended to the matrix value as 2nd chars
+
     NOT_CLICKED_CELL = "+"
     CLICKED_CELL = "-"
+
+
     def __init__(self, h, w, b):
         self.h = h
         self.w = w
         self.b = b
-        assert self.b <= self.h * self.w
-        self.generate()
+        assert self.b <= self.h * self.w # проверяем что бомб меньше или равно кол-ву клеток
+        self.generate() # создаем карту
 
 
     def generate(self):
         self.map = []
         self.open = 0
+        "Все нули"
         for i in range(self.h):
             self.map.append([])
             for j in range(self.w):
@@ -28,34 +30,14 @@ class MapModel(object):
         w = random.randint(0, self.w - 1)
         h = random.randint(0, self.h - 1)
 
+        "Добавляем бомбы"
         for b in range(self.b):
             while self.map[h][w] != self.NOT_CLICKED_EMPTY:
                 w = random.randint(0,self.w-1)
                 h = random.randint(0,self.h-1)
             self.map[h][w] = self.NOT_CLICKED_BOMB
-        self.map = self.count_mins()
-        return self.map
 
-
-    def cell_value(self, i , j):
-        return self.map[i][j]
-
-    def is_bomb(self, i, j):
-        return self.map[i][j] == self.NOT_CLICKED_BOMB
-
-    def is_not_click_bomb(self, i, j):
-        return self.map[i][j] == self.NOT_CLICKED_BOMB
-
-    def get_all_bombs(self):
-        all_map = []
-        for i in range(self.h):
-            for j in range(self.w):
-                if self.map[i][j] == self.NOT_CLICKED_BOMB:
-                    all_map.append([i,j])
-        self.all_map = all_map
-        return self.all_map
-
-    def count_mins(self):
+        "Количкство бомб вокруг"
         for i in range(self.h):
             for j in range(self.w):
                 if  self.map[i][j] != self.NOT_CLICKED_BOMB:
@@ -85,77 +67,99 @@ class MapModel(object):
                         if self.map[i-1][j] == self.NOT_CLICKED_BOMB:
                             count += 1
                     self.map[i][j] = str(count) + self.NOT_CLICKED_CELL
-        print(self.map)
+        self.pprint(self.map)
         return self.map
+
+
+    def get_all_bombs(self):
+        all_map = []
+        for i in range(self.h):
+            for j in range(self.w):
+                if self.map[i][j] == self.NOT_CLICKED_BOMB:
+                    all_map.append([i,j])
+        self.all_map = all_map
+        return self.all_map
+
 
     def all_open(self):
         return self.open == self.h * self.w - self.b
 
-    def no_mins(self,i,j, clicked_cells = None):
-        if clicked_cells is None:
-            clicked_cells = []
-        # collect list of clicked_cells
+    def no_mins(self,i,j):
         if not self.all_open():
-            if i != self.H - 1 and j != self.W - 1:
+            if i != self.h - 1 and j != self.w - 1:
                     self.click_cell(i+1,j+1)
-                    clicked_cells.append((i+1, j+1, self.map[i+1][j+1][0]))
             if i != 0 and j != 0:
                     self.click_cell(i - 1, j - 1)
-
-            if i != 0 and j != self.W - 1:
+            if i != 0 and j != self.w - 1:
                     self.click_cell(i - 1, j + 1)
-
-            if i != self.H - 1 and j != 0:
+            if i != self.h - 1 and j != 0:
                     self.click_cell(i + 1, j - 1)
-
-            if j != self.W - 1:
+            if j != self.h - 1:
                     self.click_cell(i, j + 1)
-
-            if i != self.H - 1:
+            if i != self.h - 1:
                     self.click_cell(i + 1, j)
-
             if j != 0:
                     self.click_cell(i, j - 1)
-
             if i != 0:
                     self.click_cell(i - 1, j)
-
         else:
             self.game_end("no_mins", "win")
+        return
 
     def click_cell(self,i,j):
-        if self.cart[i][j][0] != self.NOT_CLICKED_BOMB[0]:
+        try:
+            if self.clicked_cells is None:
+                pass
+        except AttributeError:
+            self.clicked_cells = []
+        except:
+            raise
+        # collect list of clicked_cells
+        if self.map[i][j][0] != self.NOT_CLICKED_BOMB[0]:
             self.open += 1
-            self.map[i][j] = self.map[i][j][0] + self.CLICKED_CELL
-            if self.cart[i][j] == self.NOT_CLICKED_EMPTY:
+            self.clicked_cells.append((i, j, self.map[i][j][0]))
+            if self.map[i][j] == self.NOT_CLICKED_EMPTY:
+                self.map[i][j] = self.map[i][j][0] + self.CLICKED_CELL
                 self.no_mins(i,j)
-        return self.all_open()
+            else:
+                self.map[i][j] = self.map[i][j][0] + self.CLICKED_CELL
+        return self.clicked_cells
 
 
     def btnclick(self, i, j, mouseBut=Qt.Qt.LeftButton):
         if mouseBut == Qt.Qt.LeftButton:
             if self.map[i][j][1] == self.CLICKED_CELL:
+                print("already_clicked")
                 return {"type":"already_clicked"}
+
             elif self.map[i][j] == self.NOT_CLICKED_BOMB:
+                print("mine")
                 return {"type" : "mine",
                         "bombs": self.get_all_bombs()}
+
             elif self.map[i][j][0] in '12345678':
-                if self.click_cell(i, j): # last
+                if self.all_open():
                     return {"type" : "win_cell",
                             "value" : self.map[i][j][0]}
                 else:
                     return {"type": "cell",
                             "value": self.map[i][j][0]}
+
             elif self.map[i][j] == self.NOT_CLICKED_EMPTY:
-                self.no_mins(i, j)
-                if self.click_cell(i, j): # last
+                if self.all_open():
                     return {"type" : "win_cell",
                             "value" : self.map[i][j][0]}
                 else:
-                    return {"type": "cell",
-                            "value": self.map[i][j][0]}
+                    print("cell")
+                    return {"type": "cell_ZERO",
+                            "value": self.click_cell(i,j)}
 
+    def pprint(self, text):
+		"""Добавляем красоту"""
+        for i in text:
+            for j in i:
+                print(j[0],end=" ")
+            print("")
+        print("")
 
-
-x = MapModel(8,10,2)
-#print(x.generate())
+#x = MapModel(4,3,2)
