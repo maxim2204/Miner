@@ -17,7 +17,7 @@ class MinerMap(QtWidgets.QWidget):
 
         self.cheat = cheat
 
-        self.MAP = MapModel(h, w , b)
+        self.MAP = MapModel(h, w , b, self)
 
         self.cart = self.MAP.generate()
 
@@ -83,7 +83,6 @@ class MinerMap(QtWidgets.QWidget):
                 j = self.buts[i].index(self.sender())
             else:
                 continue
-
             result = self.MAP.btnclick(i, j, Qt.Qt.LeftButton)
             if result["type"] == "cell":
                 self.buts[i][j].setText(result["value"])
@@ -107,6 +106,7 @@ class MinerMap(QtWidgets.QWidget):
 
 
 
+
     """def set_text(self,i,j):
         if self.cart[i][j] != "*" and self.buts[i][j].isEnabled():
             self.buts[i][j].setText(str(self.cart[i][j]))
@@ -114,27 +114,19 @@ class MinerMap(QtWidgets.QWidget):
             self.open += 1
             print(i, "", j, "", self.open,"/",self.h * self.w - self.b, "no_mins")
             if self.cart[i][j] == 0:
-                self.no_mins(i,j)
+                self.no_mins(i,j)"""
 
 
 
-    def game_end(self, ttype, winorlose):
+    def game_end(self, winorlose):
+        self.disabled(True)
         self.cheats()
-        self.setDisabled(True)
-        if self.end == False:
-            # self.clock.stop()
-            # todo: create method parameter if you need report result to the friend (two different win ttype's)
-            self.parent().send(winorlose)  # if self.MODE == 'master' else "dfdfdf"
-            massage = QMessageBox.question(self,  "ВИН" if winorlose == "win" else "Мина", "Красавчик" if winorlose == "win" else "ЛОХ", QMessageBox.Close)
-            if winorlose == "win":
-                self.win = True
-            else:
-                self.win = False
-            self.end = True
-            print(ttype)
+        # self.clock.stop()
+        #self.parent().send(winorlose)  # if self.MODE == 'master' else "dfdfdf"
+        massage = QMessageBox.question(self,  "" if winorlose == "win" else "", "Красавчик" if winorlose == "win" else "ЛОХ", QMessageBox.Close)
 
-    def win(self):
-        return self.win
+
+
 
     def cheats(self):
         s = self.MAP.get_all_bombs()
@@ -144,7 +136,8 @@ class MinerMap(QtWidgets.QWidget):
                 y = j[0]
                 self.buts[y][x].setText("💣")
             except IndexError:
-                print(x,y)"""
+                print(x,y)
+
 
 
     def disabled(self, TF):

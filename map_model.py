@@ -10,10 +10,11 @@ class MapModel(object):
     CLICKED_CELL = "-"
 
 
-    def __init__(self, h, w, b):
+    def __init__(self, h, w, b, parent):
         self.h = h
         self.w = w
         self.b = b
+        self.parent = parent
         assert self.b <= self.h * self.w # проверяем что бомб меньше или равно кол-ву клеток
         self.generate() # создаем карту
 
@@ -106,7 +107,7 @@ class MapModel(object):
             if i != 0:
                     self.click_cell(i - 1, j)
         else:
-            self.game_end("no_mins", "win")
+            self.parent.game_end("win")
         return
 
     def click_cell(self,i,j):
@@ -130,6 +131,7 @@ class MapModel(object):
 
 
     def btnclick(self, i, j, mouseBut=Qt.Qt.LeftButton):
+        """нажатие на кнопку"""
         print(self.open)
         if mouseBut == Qt.Qt.LeftButton:
             if self.map[i][j][1] == self.CLICKED_CELL:
@@ -137,7 +139,6 @@ class MapModel(object):
                 return {"type":"already_clicked"}
 
             elif self.map[i][j] == self.NOT_CLICKED_BOMB:
-                print("mine")
                 return {"type" : "mine",
                         "bombs": self.get_all_bombs()}
 
