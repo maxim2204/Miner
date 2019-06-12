@@ -21,6 +21,9 @@ class MapModel(object):
     def generate(self):
         self.map = []
         self.open = 0
+        seed = random.randint(0, 10000000)
+        random.seed(seed)
+        print("seed = {}".format(seed))
         "Все нули"
         for i in range(self.h):
             self.map.append([])
@@ -115,7 +118,7 @@ class MapModel(object):
         except:
             raise
         # collect list of clicked_cells
-        if self.map[i][j][0] != self.NOT_CLICKED_BOMB[0]:
+        if self.map[i][j][0] in "123456780" and self.map[i][j][1] == self.NOT_CLICKED_CELL:
             self.open += 1
             self.clicked_cells.append((i, j, self.map[i][j][0]))
             if self.map[i][j] == self.NOT_CLICKED_EMPTY:
@@ -127,6 +130,7 @@ class MapModel(object):
 
 
     def btnclick(self, i, j, mouseBut=Qt.Qt.LeftButton):
+        print(self.open)
         if mouseBut == Qt.Qt.LeftButton:
             if self.map[i][j][1] == self.CLICKED_CELL:
                 print("already_clicked")
@@ -138,6 +142,7 @@ class MapModel(object):
                         "bombs": self.get_all_bombs()}
 
             elif self.map[i][j][0] in '12345678':
+                self.click_cell(i,j)
                 if self.all_open():
                     return {"type" : "win_cell",
                             "value" : self.map[i][j][0]}
@@ -155,7 +160,7 @@ class MapModel(object):
                             "value": self.click_cell(i,j)}
 
     def pprint(self, text):
-	"""Добавляем красоту"""
+        """Добавляем красоту"""
         for i in text:
             for j in i:
                 print(j[0],end=" ")

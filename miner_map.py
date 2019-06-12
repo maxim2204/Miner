@@ -21,9 +21,9 @@ class MinerMap(QtWidgets.QWidget):
 
         self.cart = self.MAP.generate()
 
-        self.open = 0
         self.win = False
         self.end = False
+        self.bomb = "💣"
 
         if self.cheat == 1:
             self.cheats()
@@ -32,6 +32,7 @@ class MinerMap(QtWidgets.QWidget):
 
         grid = QtWidgets.QGridLayout()
         vbox = QtWidgets.QVBoxLayout()
+        hbox = QtWidgets.QHBoxLayout()
 
         self.clock = DigitalClock(self)
         self.clock.stop()
@@ -48,7 +49,10 @@ class MinerMap(QtWidgets.QWidget):
                 buts[-1][-1].clicked.connect(self.btnclick)
                 grid.addWidget(buts[i][j],i, j)
         self.buts = buts
-        vbox.addWidget(self.clock)
+        hbox.addStretch()
+        hbox.addWidget(self.clock)
+        hbox.addStretch()
+        vbox.addLayout(hbox)
         vbox.addLayout(grid)
 
         self.setLayout(vbox)
@@ -69,7 +73,7 @@ class MinerMap(QtWidgets.QWidget):
     def btnclick(self):
 
 
-        if self.open == 0:
+        if self.MAP.open == 0:
             self.clock.reset()
             self.clock.start()
 
@@ -87,7 +91,17 @@ class MinerMap(QtWidgets.QWidget):
                 x = result["value"]
                 for i in x:
                     self.buts[i[0]][i[1]].setText(i[2])
-
+            elif result["type"] == "mine":
+                x = result["bombs"]
+                for i in x:
+                    self.buts[i[0]][i[1]].setText(self.bomb)
+                self.disabled(True)
+                self.clock.stop()
+            elif result["type"] == "win_cell":
+                x = result["value"]
+                self.buts[i][j].setText(x)
+                self.disabled(True)
+                self.clock.stop()
 
 
 
@@ -130,14 +144,14 @@ class MinerMap(QtWidgets.QWidget):
                 y = j[0]
                 self.buts[y][x].setText("💣")
             except IndexError:
-                print(x,y)
+                print(x,y)"""
 
 
     def disabled(self, TF):
         for i in range(self.h):
             self.buts.append([])
             for j in range(self.w):
-                self.buts[i][j].setDisabled(TF)"""
+                self.buts[i][j].setDisabled(TF)
 
 
 
