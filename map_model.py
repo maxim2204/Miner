@@ -155,7 +155,7 @@ class MapModel(object):
                             "value": self.click_cell(i,j)}
 
     def pprint(self, text):
-		"""Добавляем красоту"""
+	"""Добавляем красоту"""
         for i in text:
             for j in i:
                 print(j[0],end=" ")
