@@ -158,7 +158,23 @@ class MapModel(object):
                 else:
                     print("cell")
                     return {"type": "cell_ZERO",
-                            "value": self.click_cell(i,j)}
+                        "value": self.click_cell(i,j)}
+            elif self.map[i][j][-1] == "F":
+                return {"type": "cell_Flag"}
+
+
+
+        if mouseBut == Qt.Qt.RightButton:
+            if self.map[i][j][-1] == "F":
+                self.map[i][j] = self.map[i][j][:-1]
+                return {"type": "removeFlag"}
+            elif self.map[i][j][-1] == self.NOT_CLICKED_CELL:
+                self.map[i][j] = self.map[i][j] + "F"
+                return {"type": "addFlag"}
+            elif self.map[i][j][-1] == self.CLICKED_CELL:
+                return {"type": "clicked"}
+
+
 
     def pprint(self, text):
         """Добавляем красоту"""

@@ -24,6 +24,7 @@ class MinerMap(QtWidgets.QWidget):
         self.win = False
         self.end = False
         self.bomb = "💣"
+        self.flag = "⚑"
 
         if self.cheat == 1:
             self.cheats()
@@ -43,10 +44,10 @@ class MinerMap(QtWidgets.QWidget):
             buts.append([])
             for j in range(self.w):
                 #buts[-1].append(QtWidgets.QPushButton("{} {}".format(i,j), self))
-                buts[-1].append(MyButton2("*+", self))
+                buts[-1].append(MyButton2(i, j, "*+", self))
                 buts[-1][-1].setMinimumSize(25, 25)
                 buts[-1][-1].setMaximumSize(25, 25)
-                buts[-1][-1].clicked.connect(self.btnclick)
+                #buts[-1][-1].clicked.connect(self.btnclick)
                 grid.addWidget(buts[i][j],i, j)
         self.buts = buts
         hbox.addStretch()
@@ -70,7 +71,7 @@ class MinerMap(QtWidgets.QWidget):
     def getbuts(self):
         return self.buts"""
 
-    def btnclick(self):
+    def onLeftClick(self, i, j):
 
 
         if self.MAP.open == 0:
@@ -78,34 +79,42 @@ class MinerMap(QtWidgets.QWidget):
             self.clock.start()
 
 
-        for i in range(self.h):
-            if self.sender() in self.buts[i]:
-                j = self.buts[i].index(self.sender())
-            else:
-                continue
-            result = self.MAP.btnclick(i, j, Qt.Qt.LeftButton)
-            if result["type"] == "cell":
-                self.buts[i][j].setText(result["value"])
-            elif result["type"] == "cell_ZERO":
-                x = result["value"]
-                for i in x:
-                    self.buts[i[0]][i[1]].setText(i[2])
-            elif result["type"] == "mine":
-                x = result["bombs"]
-                for i in x:
-                    self.buts[i[0]][i[1]].setText(self.bomb)
-                self.disabled(True)
-                self.clock.stop()
-                self.game_end("lose")
-            elif result["type"] == "win_cell":
-                x = result["value"]
-                self.buts[i][j].setText(x)
-                self.disabled(True)
-                self.clock.stop()
-                self.game_end("win")
+        result = self.MAP.btnclick(i, j, Qt.Qt.LeftButton)
+        if result["type"] == "cell":
+            self.buts[i][j].setText(result["value"])
+        elif result["type"] == "cell_ZERO":
+            x = result["value"]
+            for i in x:
+                self.buts[i[0]][i[1]].setText(i[2])
+        elif result["type"] == "mine":
+            x = result["bombs"]
+            for i in x:
+                self.buts[i[0]][i[1]].setText(self.bomb)
+            self.disabled(True)
+            self.clock.stop()
+            self.game_end("lose")
+        elif result["type"] == "win_cell":
+            x = result["value"]
+            self.buts[i][j].setText(x)
+            self.disabled(True)
+            self.clock.stop()
+            self.game_end("win")
+        elif result["type"] == "cell_Flag":
+            pass
 
 
-
+    def onRightClick(self, i ,j):
+        result = self.MAP.btnclick(i, j, Qt.Qt.RightButton)
+        print(result)
+        x = result["type"]
+        if result["type"] == "addFlag":
+            self.buts[i][j].setText(self.flag)
+        elif result["type"] == "removeFlag":
+            self.buts[i][j].setText("")
+        elif result["type"] == "clicked":
+            pass
+        else:
+            print(result)
 
 
 
