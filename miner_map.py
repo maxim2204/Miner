@@ -127,6 +127,18 @@ class MinerMap(QtWidgets.QWidget):
             if self.cart[i][j] == 0:
                 self.no_mins(i,j)"""
 
+    def onMiddleClick(self, i ,j):
+        result = self.MAP.btnclick(i, j, Qt.Qt.MiddleButton)
+        print(result)
+        x = result["type"]
+        if result["type"] == "addFlag":
+            self.buts[i][j].setText(self.flag)
+        elif result["type"] == "removeFlag":
+            self.buts[i][j].setText("")
+        elif result["type"] == "clicked":
+            pass
+        else:
+            print(result)
 
 
     def game_end(self, winorlose):

@@ -175,6 +175,67 @@ class MapModel(object):
                 return {"type": "clicked"}
 
 
+        if mouseBut == Qt.Qt.MiddleButton:
+            if self.map[i][j][-1] == self.CLICKED_CELL:
+                count = int(self.map[i][j])
+                if i != self.h - 1 and j != self.w - 1 and self.map[i+1][j+1][-1] == "F":
+                    count -= 1
+                if i != 0 and j != 0 and self.map[i-1][j-1][-1] == "F":
+                    count -= 1
+                if i != 0 and j != self.w - 1 and self.map[i-1][j+1][-1] == "F":
+                    count -= 1
+                if i != self.h - 1 and j != 0 and self.map[i+1][j-1][-1] == "F":
+                    count -= 1
+                if j != self.h - 1 and self.map[i][j+1][-1] == "F":
+                    count -= 1
+                if i != self.h - 1 and self.map[i+1][j][-1] == "F":
+                    count -= 1
+                if j != 0 and self.map[i][j-1][-1] == "F":
+                    count -= 1
+                if i != 0 and self.map[i-1][j][-1] == "F":
+                    count -= 1
+                if count == 0:
+                    bomb = False
+                    if i != self.h - 1 and j != self.w - 1 and self.map[i + 1][j + 1][-1] != "F" and self.map[i + 1][j + 1][0] != "*":
+                        bomb = True
+                    if i != 0 and j != 0 and self.map[i - 1][j - 1][-1] != "F" and self.map[i - 1][j - 1][-1] != "*":
+                        bomb = True
+                    if i != 0 and j != self.w - 1 and self.map[i - 1][j + 1][-1] != "F" and self.map[i - 1][j + 1][-1] != "*":
+                        bomb = True
+                    if i != self.h - 1 and j != 0 and self.map[i + 1][j - 1][-1] != "F" and self.map[i + 1][j - 1][-1] != "*":
+                        bomb = True
+                    if j != self.h - 1 and self.map[i][j + 1][-1] != "F" and self.map[i][j + 1][-1] != "*":
+                        bomb = True
+                    if i != self.h - 1 and self.map[i + 1][j][-1] != "F" and self.map[i + 1][j][-1] != "*":
+                        bomb = True
+                    if j != 0 and self.map[i][j - 1][-1] != "F" and self.map[i][j - 1][-1] != "*":
+                        bomb = True
+                    if i != 0 and self.map[i - 1][j][-1] != "F" and self.map[i - 1][j][-1] != "*":
+                        bomb = True
+                    if bomb:
+                        return {"type": "lose",
+                                "value": self.get_all_bombs()}
+                    else:
+                        get = []
+                        if i != self.h - 1 and j != self.w - 1 and self.map[i + 1][j + 1][-1] == self.NOT_CLICKED_CELL:
+                            get.append((i,j,self.map[i][j]))
+                        if i != 0 and j != 0 and self.map[i - 1][j - 1][-1] == self.NOT_CLICKED_CELL:
+                            get.append((i, j, self.map[i][j]))
+                        if i != 0 and j != self.w - 1 and self.map[i - 1][j + 1][-1] == self.NOT_CLICKED_CELL:
+                            get.append((i, j, self.map[i][j]))
+                        if i != self.h - 1 and j != 0 and self.map[i + 1][j - 1][-1] == self.NOT_CLICKED_CELL:
+                            get.append((i, j, self.map[i][j]))
+                        if j != self.h - 1 and self.map[i][j + 1][-1] == self.NOT_CLICKED_CELL:
+                            get.append((i, j, self.map[i][j]))
+                        if i != self.h - 1 and self.map[i + 1][j][-1] == self.NOT_CLICKED_CELL:
+                            get.append((i, j, self.map[i][j]))
+                        if j != 0 and self.map[i][j - 1][-1] == self.NOT_CLICKED_CELL:
+                            get.append((i, j, self.map[i][j]))
+                        if i != 0 and self.map[i - 1][j][-1] == self.NOT_CLICKED_CELL:
+                            get.append((i, j, self.map[i][j]))
+                        return {"type": "open",
+                                "value": get}
+
 
     def pprint(self, text):
         """Добавляем красоту"""
