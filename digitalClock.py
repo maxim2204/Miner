@@ -4,6 +4,7 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import QTime
 from PyQt5 import Qt
 
+
 class DigitalClock(QLCDNumber):
     def __init__(self, parent):
         super().__init__(parent)

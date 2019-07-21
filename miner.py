@@ -65,8 +65,9 @@ class MainWindow(QMainWindow):
         self.show()
 
     def closeEvent(self, event):
-        self.signal.set()
-        print(42)
+        if self.MODE != "single_player":
+            self.signal.set()
+            print(42)
 
     def end(self):
         # check if self is won already

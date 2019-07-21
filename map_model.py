@@ -176,8 +176,10 @@ class MapModel(object):
 
 
         if mouseBut == Qt.Qt.MiddleButton:
+            print(11111111111111)
             if self.map[i][j][-1] == self.CLICKED_CELL:
-                count = int(self.map[i][j])
+                print(int(self.map[i][j][0]))
+                count = int(self.map[i][j][0])
                 if i != self.h - 1 and j != self.w - 1 and self.map[i+1][j+1][-1] == "F":
                     count -= 1
                 if i != 0 and j != 0 and self.map[i-1][j-1][-1] == "F":
@@ -196,46 +198,72 @@ class MapModel(object):
                     count -= 1
                 if count == 0:
                     bomb = False
-                    if i != self.h - 1 and j != self.w - 1 and self.map[i + 1][j + 1][-1] != "F" and self.map[i + 1][j + 1][0] != "*":
+                    if i != self.h - 1 and j != self.w - 1 and self.map[i + 1][j + 1][-1] != "F" and self.map[i + 1][j + 1][0] == "*":
                         bomb = True
-                    if i != 0 and j != 0 and self.map[i - 1][j - 1][-1] != "F" and self.map[i - 1][j - 1][-1] != "*":
+                        print("12123")
+                    if i != 0 and j != 0 and self.map[i - 1][j - 1][-1] != "F" and self.map[i - 1][j - 1][0] == "*":
                         bomb = True
-                    if i != 0 and j != self.w - 1 and self.map[i - 1][j + 1][-1] != "F" and self.map[i - 1][j + 1][-1] != "*":
+                        print("12123")
+                    if i != 0 and j != self.w - 1 and self.map[i - 1][j + 1][-1] != "F" and self.map[i - 1][j + 1][0] == "*":
                         bomb = True
-                    if i != self.h - 1 and j != 0 and self.map[i + 1][j - 1][-1] != "F" and self.map[i + 1][j - 1][-1] != "*":
+                        print("12123")
+                    if i != self.h - 1 and j != 0 and self.map[i + 1][j - 1][-1] != "F" and self.map[i + 1][j - 1][0] == "*":
                         bomb = True
-                    if j != self.h - 1 and self.map[i][j + 1][-1] != "F" and self.map[i][j + 1][-1] != "*":
+                        print("12123")
+                    if j != self.h - 1 and self.map[i][j + 1][-1] != "F" and self.map[i][j + 1][0] == "*":
                         bomb = True
-                    if i != self.h - 1 and self.map[i + 1][j][-1] != "F" and self.map[i + 1][j][-1] != "*":
+                        print("12123")
+                    if i != self.h - 1 and self.map[i + 1][j][-1] != "F" and self.map[i + 1][j][0] == "*":
                         bomb = True
-                    if j != 0 and self.map[i][j - 1][-1] != "F" and self.map[i][j - 1][-1] != "*":
+                        print("12123")
+                    if j != 0 and self.map[i][j - 1][-1] != "F" and self.map[i][j - 1][0] == "*":
                         bomb = True
-                    if i != 0 and self.map[i - 1][j][-1] != "F" and self.map[i - 1][j][-1] != "*":
+                        print("12123")
+                    if i != 0 and self.map[i - 1][j][-1] != "F" and self.map[i - 1][j][0] == "*":
                         bomb = True
+                        print("12123")
                     if bomb:
                         return {"type": "lose",
                                 "value": self.get_all_bombs()}
                     else:
+                        x = []
                         get = []
                         if i != self.h - 1 and j != self.w - 1 and self.map[i + 1][j + 1][-1] == self.NOT_CLICKED_CELL:
-                            get.append((i,j,self.map[i][j]))
+                            get.append((i+1,j+1,self.map[i+1][j+1][0]))
                         if i != 0 and j != 0 and self.map[i - 1][j - 1][-1] == self.NOT_CLICKED_CELL:
-                            get.append((i, j, self.map[i][j]))
+                            get.append((i-1, j-1, self.map[i-1][j-1][0]))
                         if i != 0 and j != self.w - 1 and self.map[i - 1][j + 1][-1] == self.NOT_CLICKED_CELL:
-                            get.append((i, j, self.map[i][j]))
+                            get.append((i-1, j+1, self.map[i-1][j+1][0]))
                         if i != self.h - 1 and j != 0 and self.map[i + 1][j - 1][-1] == self.NOT_CLICKED_CELL:
-                            get.append((i, j, self.map[i][j]))
+                            get.append((i+1, j-1, self.map[i+1][j-1][0]))
                         if j != self.h - 1 and self.map[i][j + 1][-1] == self.NOT_CLICKED_CELL:
-                            get.append((i, j, self.map[i][j]))
+                            get.append((i, j+1, self.map[i][j+1][0]))
                         if i != self.h - 1 and self.map[i + 1][j][-1] == self.NOT_CLICKED_CELL:
-                            get.append((i, j, self.map[i][j]))
+                            get.append((i+1, j, self.map[i+1][j][0]))
                         if j != 0 and self.map[i][j - 1][-1] == self.NOT_CLICKED_CELL:
-                            get.append((i, j, self.map[i][j]))
+                            get.append((i, j-1, self.map[i][j-1][0]))
                         if i != 0 and self.map[i - 1][j][-1] == self.NOT_CLICKED_CELL:
-                            get.append((i, j, self.map[i][j]))
-                        return {"type": "open",
+                            get.append((i-1, j, self.map[i-1][j][0]))
+                        for i in get:
+                            if self.map[i[0]][i[1]][0] == "0":
+                                x = self.click_cell(i[0],i[1])
+                        for i in get:
+                            if self.map[i[0]][i[1]][-1] == self.NOT_CLICKED_CELL:
+                                self.map[i[0]][i[1]] = self.map[i[0]][i[1]][0] + self.CLICKED_CELL
+                                self.open += 1
+                        if x == None:
+                            return {"type": "open",
                                 "value": get}
-
+                        else:
+                            get = get + x
+                            return {"type": "open",
+                                    "value": get}
+                else:
+                    return {"type": "pass",
+                            "value": None}
+            else:
+                return {"type": "pass",
+                        "value": None}
 
     def pprint(self, text):
         """Добавляем красоту"""

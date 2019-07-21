@@ -130,15 +130,27 @@ class MinerMap(QtWidgets.QWidget):
     def onMiddleClick(self, i ,j):
         result = self.MAP.btnclick(i, j, Qt.Qt.MiddleButton)
         print(result)
-        x = result["type"]
-        if result["type"] == "addFlag":
-            self.buts[i][j].setText(self.flag)
-        elif result["type"] == "removeFlag":
-            self.buts[i][j].setText("")
+        x = result["value"]
+        if result["type"] == "lose":
+            print("__{}___".format(x))
+            for i in x:
+                print((i[0],i[1]))
+                self.buts[i[0]][i[1]].setText(self.bomb)
+            self.disabled(True)
+            self.clock.stop()
+            self.game_end("lose")
+        elif result["type"] == "open":
+            print(x)
+            for i in x:
+                self.buts[i[0]][i[1]].setText(i[2])
         elif result["type"] == "clicked":
-            pass
+            print((i[0], i[1]))
         else:
             print(result)
+        if result["type"] == "pass":
+            pass
+        if self.MAP.all_open():
+            self.game_end("win")
 
 
     def game_end(self, winorlose):
