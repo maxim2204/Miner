@@ -62,6 +62,12 @@ class MainWindow(QMainWindow):
         settings = menubar.addMenu('&Settings')
         settings.addAction(mapSettingsAction)
 
+        if self.MODE == "slave":
+            settings.setEnabled(False)
+
+        if self.MODE != "single_player":
+            self.map_.disabled(True)
+
         self.show()
 
     def closeEvent(self, event):
@@ -69,12 +75,24 @@ class MainWindow(QMainWindow):
             self.signal.set()
             print(42)
 
-    def end(self):
-        # check if self is won already
-        self.map_.game_end("Your friend was faster","lose")
+    def end(self, message):
+        if message == "win":
+            self.map_.game_end("lose")
+        if message == "lose":
+            self.map_.game_end("win")
 
+    def start(self, message):
+        x,y,z = message.split(",")
+        x,y,z = int(x),int(y),int(z)
+        self.create_game(x,y,z)
 
-
+    def create_game(self,x,y,z,cheats=0):
+        self.map_ = MinerMap(x,y,z,cheats,self)
+        print(1111111111)
+        self.map_.disabled(True)
+        self.setCentralWidget(self.map_)
+        self.resize(150, 220)
+        self.map_.disabled(False)
 
 
     def send(self, message):
@@ -91,13 +109,10 @@ class MainWindow(QMainWindow):
 
 
     def close_map_settings(self):
-        self.map_ = MinerMap(self.s.slider_x.value(), self.s.slider_y.value(), self.s.slider_b.value(),
-                             1 if self.s.is_cheats() else 0, self)
-        self.map_.disabled(True)
-        self.setCentralWidget(self.map_)
-        self.resize(150, 220)
-        self.map_.disabled(False)
-
+        if self.MODE == "master":
+            self.send("{},{},{}".format(self.s.slider_x.value(), self.s.slider_y.value(), self.s.slider_b.value()))
+        x,y,z = self.s.slider_x.value(), self.s.slider_y.value(), self.s.slider_b.value()
+        self.create_game(x,y,z,1 if self.s.is_cheats() else 0)
         #self.setMaximumSize(self.s.slider_x.value()*10, self.s.slider_y.value()*4)
         #self.maximumSize()
 
@@ -142,9 +157,11 @@ class ClientThreadMaster(Thread):
             # (conn, (self.ip,self.port)) = serverThread.tcpServer.accept()
             global conn
             data = conn.recv(2048)
-            if data.decode("utf-8") == "win":
-                print("&&&&&&&&&&&&&&&&&&")
-                self.window.end()
+            data = data.decode("utf-8")
+            if data == "win" or data == "lose":
+                self.window.end(data)
+            else:
+                self.window.start(data)
 
 
 class ClientThreadSlave(Thread):
@@ -164,9 +181,11 @@ class ClientThreadSlave(Thread):
         # while not self.window.signal.isSet():
         while True:
             data = tcpClientA.recv(BUFFER_SIZE)
-            print("&&&&&&&&&&&&&&&&&&")
-            if data.decode("utf-8") == "win":
-                self.window.end()
+            data = data.decode("utf-8")
+            if data == "win" or data == "lose":
+                self.window.end(data)
+            else:
+                self.window.start(data)
         tcpClientA.close()
 
 

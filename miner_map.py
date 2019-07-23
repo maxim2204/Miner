@@ -156,8 +156,8 @@ class MinerMap(QtWidgets.QWidget):
     def game_end(self, winorlose):
         self.disabled(True)
         self.cheats()
-        # self.clock.stop()
-        #self.parent().send(winorlose)  # if self.MODE == 'master' else "dfdfdf"
+        self.clock.stop()
+        self.parent().send(winorlose)
         massage = QMessageBox.question(self,  "" if winorlose == "win" else "", "Красавчик" if winorlose == "win" else "ЛОХ", QMessageBox.Close)
 
 
