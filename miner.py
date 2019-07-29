@@ -1,9 +1,11 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QMessageBox
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QTimer
 from miner_map import MinerMap
 from map_settings import Map_settings
 import socket
+import select
 from threading import Thread, Event
 conn=None
 tcpClientA=None
@@ -19,14 +21,20 @@ class MainWindow(QMainWindow):
         print(self.MODE)
         # self.signal = Event()
         ip, port = ip.split(":")
+        self.timer = QTimer()
         if self.MODE == "master":
-            self.serverThread = ServerThread(self,ip, port)
-            self.serverThread.start()
+            self.start_server(ip, port)
+            print("connect timer for master")
+            self.timer.timeout.connect(self.listen_master)
+            print("connected timer for master")
         elif self.MODE == "slave":
-            self.clientThread = ClientThreadSlave(self,ip, port)
-            self.clientThread.start()
+            self.start_client_slave(ip, port)
+            print("connect timer for slave")
+            self.timer.timeout.connect(self.listen_slave)
+            print("connected timer for slave")
         elif self.MODE != "single_player":
             raise ValueError("Invalid MODE")
+        self.timer.start(5000)
         self.initUI(5,5,3)
 
 
@@ -72,14 +80,14 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         if self.MODE != "single_player":
-            self.signal.set()
+            self.timer.stop()
             print(42)
 
     def end(self, message):
         if message == "win":
-            self.map_.game_end("lose")
+            self.map_.game_end("lose", True)
         if message == "lose":
-            self.map_.game_end("win")
+            self.map_.game_end("win", True)
 
     def start(self, message):
         x,y,z = message.split(",")
@@ -96,11 +104,14 @@ class MainWindow(QMainWindow):
 
 
     def send(self, message):
-        if self.MODE != "single_player":
-            global conn
-            conn.send(message.encode("utf-8")) if self.MODE == 'master' else tcpClientA.send(message.encode())
-
-
+        print("Send: {}".format(message))
+        if self.MODE == "master":
+            conn.send(message.encode("utf-8"))
+        elif self.MODE == "slave":
+            tcpClientA.send(message.encode("utf-8"))
+        else:
+            raise ValueError("wrong mode {}".format(self.MODE))
+        print("Sent successfully")
 
     def mapSettings(self):
         self.map_.disabled(True)
@@ -116,77 +127,52 @@ class MainWindow(QMainWindow):
         #self.setMaximumSize(self.s.slider_x.value()*10, self.s.slider_y.value()*4)
         #self.maximumSize()
 
-class ServerThread(Thread):
-    def __init__(self, window,ip, port):
-        Thread.__init__(self)
-        self.window = window
-        self.ip = ip
-        self.port = port
-
-    def run(self):
-        TCP_IP = self.ip
-        TCP_PORT = int(self.port)
+    def start_server(self, ip, port):
         BUFFER_SIZE = 20
         tcpServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tcpServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        tcpServer.bind((TCP_IP, TCP_PORT))
+        tcpServer.bind((ip, int(port)))
         threads = []
 
         tcpServer.listen(4)
         # while not self.window.signal.isSet():
-        while True:
-            print("Multithreaded Python server : Waiting for connections from TCP clients...")
-            global conn
-            (conn, (ip, port)) = tcpServer.accept()
-            newthread = ClientThreadMaster(ip, port, self.window)
-            newthread.start()
-            threads.append(newthread)
+        print("Multithreaded Python server : Waiting for connections from TCP clients...")
+        global conn
+        (conn, (ip, port)) = tcpServer.accept()
 
-
-class ClientThreadMaster(Thread):
-    def __init__(self, ip, port, window):
-        Thread.__init__(self)
-        self.window = window
-        self.ip = ip
-        self.port = port
-        print("[+] New server socket thread started for " + ip + ":" + str(port))
-
-    def run(self):
-        # while not self.window.signal.isSet():
-        while True:
-            # (conn, (self.ip,self.port)) = serverThread.tcpServer.accept()
-            global conn
-            data = conn.recv(2048)
-            data = data.decode("utf-8")
-            if data == "win" or data == "lose":
-                self.window.end(data)
-            else:
-                self.window.start(data)
-
-
-class ClientThreadSlave(Thread):
-    def __init__(self, window, ip, port):
-        Thread.__init__(self)
-        self.window = window
-        self.ip = ip
-        self.port = port
-
-    def run(self):
-        host = self.ip
-        port = int(self.port)
+    def start_client_slave(self, ip, port):
+        print("start_client start")
         BUFFER_SIZE = 2000
         global tcpClientA
         tcpClientA = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        tcpClientA.connect((host, port))
-        # while not self.window.signal.isSet():
-        while True:
-            data = tcpClientA.recv(BUFFER_SIZE)
+        tcpClientA.connect((ip, int(port)))
+        print("start_client end")
+
+    def listen_master(self):
+        print("listen_master start")
+        global conn
+        if conn is None:
+            print("no connection at master")
+            return
+        if select.select([conn], [], [], 1.0)[0]:
+            data = conn.recv(2048)
             data = data.decode("utf-8")
             if data == "win" or data == "lose":
-                self.window.end(data)
+                self.end(data)
             else:
-                self.window.start(data)
-        tcpClientA.close()
+                self.start(data)
+        print("listen_master end")
 
-
-
+    def listen_slave(self):
+        print("listen_slave start")
+        if tcpClientA is None:
+            print("no connection at slave")
+            return
+        if select.select([tcpClientA], [], [], 1.0)[0]:
+            data = tcpClientA.recv(2048)
+            data = data.decode("utf-8")
+            if data == "win" or data == "lose":
+                self.end(data)
+            else:
+                self.start(data)
+        print("listen_slave end")
