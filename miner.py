@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):
             print("connected timer for slave")
         elif self.MODE != "single_player":
             raise ValueError("Invalid MODE")
-        self.timer.start(5000)
+        self.timer.start(3000)
         self.initUI(5,5,3)
 
 
@@ -110,7 +110,8 @@ class MainWindow(QMainWindow):
         elif self.MODE == "slave":
             tcpClientA.send(message.encode("utf-8"))
         else:
-            raise ValueError("wrong mode {}".format(self.MODE))
+            pass
+            #raise ValueError("wrong mode {}".format(self.MODE))
         print("Sent successfully")
 
     def mapSettings(self):

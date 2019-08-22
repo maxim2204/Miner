@@ -8,7 +8,7 @@ from PyQt5 import Qt
 class DigitalClock(QLCDNumber):
     def __init__(self, parent):
         super().__init__(parent)
-        self.setDigitCount(8)
+        self.setDigitCount(9)
         self.setSegmentStyle(QLCDNumber.Filled);
         self.i = 0
         self.timer = QTimer(self)
